@@ -148,9 +148,9 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 CORS_ORIGIN_ALLOW_ALL = True  # 允许跨域名访问
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ORIGIN_WHITELIST = (
-    '*',
-)
+# CORS_ORIGIN_WHITELIST = (
+#     '*',
+# )
 
 CORS_ALLOW_METHODS = (
     'DELETE',
@@ -195,7 +195,7 @@ REST_FRAMEWORK = {
 }
 
 # models--->增加models SQL日志，并生成日志文件
-BASE_LOG_DIR = os.path.join(BASE_DIR, "logs", "message.log")
+BASE_LOG_DIR = os.path.join(BASE_DIR, "logs")
 
 LOGGING = {
     'version': 1,  # 版本
@@ -204,6 +204,9 @@ LOGGING = {
         'standard': {
             'format': '%(asctime)s [%(name)s:%(lineno)d] [%(module)s:%(funcName)s] [%(levelname)s]- %(message)s',
         },
+        'only_text': {
+            'format': '%(message)s'
+        }
     },
     'filters': {
         'require_debug_true': {
@@ -219,9 +222,9 @@ LOGGING = {
         'default': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_LOG_DIR,  # 路径
-            'maxBytes': 1024 * 1024 * 500,
-            'backupCount': 5,
+            'filename': '{}/message.log'.format(BASE_LOG_DIR),  # 路径
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 50,
             'formatter': 'standard',
             'encoding': 'utf-8',
         },
@@ -234,21 +237,39 @@ LOGGING = {
         'request_handler': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_LOG_DIR,  # 路径
-            'maxBytes': 1024 * 1024 * 500,
-            'backupCount': 5,
+            'filename': '{}/message.log'.format(BASE_LOG_DIR),  # 路径
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 50,
             'formatter': 'standard',
             'encoding': 'utf-8',
         },
         'scprits_handler': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_LOG_DIR,  # 路径
-            'maxBytes': 1024 * 1024 * 500,
-            'backupCount': 5,
+            'filename': '{}/message.log'.format(BASE_LOG_DIR),  # 路径
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 50,
             'formatter': 'standard',
             'encoding': 'utf-8',
         },
+        'error': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '{}/error.log'.format(BASE_LOG_DIR),  # 路径
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 50,
+            'formatter': 'standard',
+            'encoding': 'utf-8',
+        },
+        'sql_handler': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '{}/sql.log'.format(BASE_LOG_DIR),  # 路径
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 50,
+            'formatter': 'standard',
+            'encoding': 'utf-8',
+        }
     },
     'loggers': {
         'django': {
@@ -258,7 +279,11 @@ LOGGING = {
         },
         # 数据库日志
         'django.db.backends': {
-            'handlers': ['console'],
+            'handlers': ['sql_handler', 'console'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+        },
+        'sql': {
+            'handlers': ['sql_handler', 'console'],
             'level': 'DEBUG' if DEBUG else 'INFO',
         },
         'django.request': {
@@ -271,18 +296,8 @@ LOGGING = {
             'level': 'DEBUG' if DEBUG else 'INFO',
             'propagate': True,
         },
-        'apple.Basic_info': {
-            'handlers': ['default', 'console'],
-            'level': 'DEBUG' if DEBUG else 'INFO',
-            'propagate': True
-        },
-        'apple.Order': {
-            'handlers': ['scprits_handler', 'console'],
-            'level': 'DEBUG' if DEBUG else 'INFO',
-            'propagate': True,
-        },
-        'apple.Finance': {
-            'handlers': ['scprits_handler', 'console'],
+        'error': {
+            'handlers': ['error', 'console'],
             'level': 'DEBUG' if DEBUG else 'INFO',
             'propagate': True,
         },
